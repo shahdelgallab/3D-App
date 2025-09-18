@@ -8,12 +8,19 @@ const userFromLocalStorage = (() => {
     : null;
 })();
 
-const initialGestId = localStorage.getItem("guest-id") || `guest_${Date.now()}`;
-localStorage.setItem("guest-id", initialGestId);
+const getOrSetGuestId = (() => {
+  let guestId = localStorage.getItem("guest-id");
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (!guestId && !refreshToken) {
+    guestId = `guest_${Date.now()}`;
+    localStorage.setItem("guest-id", guestId);
+  }
+  return guestId;
+})();
 
 const initialState = {
   user: userFromLocalStorage,
-  gestId: initialGestId,
+  guestId: getOrSetGuestId,
   loading: false,
   error: null,
 };
@@ -60,15 +67,19 @@ const authSlice = createSlice({
   reducers: {
     logout(state) {
       state.user = null;
-      state.gestId = `gest_${Date.now()}`;
+      state.guestId = `guest_${Date.now()}`;
       localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      localStorage.setItem("guest-id", state.gestId);
+      localStorage.setItem("guest-id", state.guestId);
+    },
+    removeGuest(state) {
+      state.gestId = null;
+      localStorage.removeItem("guest-id");
     },
     generateNewGuestId(state) {
-      state.gestId = `gest_${Date.now()}`;
-      localStorage.setItem("guest-id", state.gestId);
+      state.guestId = `gest_${Date.now()}`;
+      localStorage.setItem("guest-id", state.guestId);
     },
   },
   extraReducers: (builder) => {
@@ -79,8 +90,6 @@ const authSlice = createSlice({
     const handleFulfilled = (state, action) => {
       state.loading = false;
       state.user = action.payload.user;
-      state.gestId = null;
-      localStorage.removeItem("guest-id");
     };
     const handleRejected = (state, action) => {
       state.loading = false;
@@ -97,6 +106,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, generateNewGuestId } = authSlice.actions;
+export const { logout, generateNewGuestId, removeGuest } = authSlice.actions;
 
 export default authSlice.reducer;

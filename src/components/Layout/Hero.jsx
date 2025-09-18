@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import HeroImage from "../../assets/hero-3d-printing.jpg";
 
 const Hero = () => {
   return (
     <section className="relative">
       <img
-        src="https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp"
+        src={HeroImage}
         alt=""
         className="w-full h-[400px] md:h-[600px] lg:h-[750px] object-cover"
       />

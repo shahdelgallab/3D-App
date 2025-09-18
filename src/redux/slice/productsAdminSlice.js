@@ -18,7 +18,7 @@ export const createProduct = createAsyncThunk(
   async (productData, { rejectWithValue }) => {
     try {
       const response = await api.post("/products", productData);
-      return response.data.data;
+      return response.data.data.product;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -30,7 +30,7 @@ export const updateProduct = createAsyncThunk(
   async ({ id, productData }, { rejectWithValue }) => {
     try {
       const response = await api.put(`/products/${id}`, productData);
-      return response.data.data;
+      return response.data.data.product;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -65,7 +65,7 @@ const productsAdminSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload;
+        state.products = action.payload.products;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;

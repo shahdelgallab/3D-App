@@ -71,8 +71,9 @@ const productSlice = createSlice({
 
     filters: {
       category: "",
+      search: "",
       sortBy: "newest",
-      limit: 10,
+      limit: 12,
       page: 1,
     },
   },
@@ -83,8 +84,9 @@ const productSlice = createSlice({
     clearFilters: (state) => {
       state.filters = {
         category: "",
+        search: "",
         sortBy: "newest",
-        limit: 10,
+        limit: 12,
         page: 1,
       };
     },
@@ -127,11 +129,12 @@ const productSlice = createSlice({
       })
       .addCase(fetchSimilarProduct.fulfilled, (state, action) => {
         state.similarProductsLoading = false;
-        state.similarProducts = action.payload.similarProducts;
+        state.similarProducts = action.payload.similarProducts.slice(0, 4);
       })
       .addCase(fetchSimilarProduct.rejected, (state, action) => {
         state.similarProductsLoading = false;
-        state.similarProductsError = action.payload?.message || "An error occurred";
+        state.similarProductsError =
+          action.payload?.message || "An error occurred";
       })
 
       .addCase(updateProduct.pending, (state) => {

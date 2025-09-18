@@ -1,152 +1,133 @@
-import React, { useEffect, useRef, useState } from "react";
-import { FaFilter } from "react-icons/fa";
-import FilterSidebar from "../components/Products/FilterSidebar";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
+import { fetchProductsByFilters } from "../redux/slice/productsSlice";
+
+import ProductGrid from "../components/Products/ProductsGrid/ProductGrid";
+import Pagination from "../components/Common/Pagination";
 import SortOptions from "../components/Products/SortOptions";
-import ProductGrid from "../components/Products/ProductGrid";
+import { X } from "lucide-react";
 
 const CollectionsPage = () => {
-  const [products, setProducts] = useState([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const sidebarRef = useRef(null);
+  const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const { categories } = useSelector((state) => state.categories);
 
-  const handleClickOutside = (e) => {
-    //close sidebar when clicking outside
-    if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
-      setIsSidebarOpen(false);
-    }
-  };
+  const { products, productsLoading, productsError, totalPages } = useSelector(
+    (state) => state.products
+  );
 
-  useEffect(() => {
-    //add eventlistent for clicks
-    document.addEventListener("mousedown", handleClickOutside);
-
-    //clean event listener
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const activeCategory = searchParams.get("category") || "All";
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const searchTerm = searchParams.get("search") || "";
+  const sortBy = searchParams.get("sortBy") || "newest";
 
   useEffect(() => {
-    setTimeout(() => {
-      const fetchedProducts = [
-        {
-          id: 1,
-          name: "product",
-          price: 20,
-          images: [
-            {
-              url: "https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp",
-            },
-          ],
-        },
-        {
-          id: 2,
-          name: "product",
-          price: 20,
-          images: [
-            {
-              url: "https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp",
-            },
-          ],
-        },
-        {
-          id: 3,
-          name: "product",
-          price: 20,
-          images: [
-            {
-              url: "https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp",
-            },
-          ],
-        },
-        {
-          id: 4,
-          name: "product",
-          price: 20,
-          images: [
-            {
-              url: "https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp",
-            },
-          ],
-        },
-        {
-          id: 5,
-          name: "product",
-          price: 20,
-          images: [
-            {
-              url: "https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp",
-            },
-          ],
-        },
-        {
-          id: 6,
-          name: "product",
-          price: 20,
-          images: [
-            {
-              url: "https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp",
-            },
-          ],
-        },
-        {
-          id: 7,
-          name: "product",
-          price: 20,
-          images: [
-            {
-              url: "https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp",
-            },
-          ],
-        },
-        {
-          id: 8,
-          name: "product",
-          price: 20,
-          images: [
-            {
-              url: "https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp",
-            },
-          ],
-        },
-      ];
-      setProducts(fetchedProducts);
-    }, 1000);
-  }, []);
+    let filters = { limit: 12 };
+    if (currentPage) filters.page = currentPage;
+    if (activeCategory && activeCategory !== "All")
+      filters.category = activeCategory;
+    if (searchTerm) filters.search = searchTerm;
+    if (sortBy) filters.sortBy = sortBy;
+
+    dispatch(fetchProductsByFilters(filters));
+  }, [dispatch, searchParams]);
+
+  const handlePageChange = (newPage) => {
+    setSearchParams((prev) => {
+      prev.set("page", String(newPage));
+      return prev;
+    });
+  };
+
+  const handleCategoryChange = (category) => {
+    setSearchParams((prev) => {
+      if (category === "All") {
+        prev.delete("category");
+      } else {
+        prev.set("category", category);
+      }
+      prev.set("page", "1");
+      return prev;
+    });
+  };
+
+  const handleSortChange = (newSortBy) => {
+    setSearchParams((prev) => {
+      if (newSortBy) {
+        prev.set("sortBy", newSortBy);
+      } else {
+        prev.delete("sortBy");
+      }
+      prev.set("page", "1");
+      return prev;
+    });
+  };
+
+  const handleClearSearch = () => {
+    setSearchParams((prev) => {
+      prev.delete("search");
+      return prev;
+    });
+  };
+
   return (
-    <div className="flex flex-col lg:flex-row">
-      {/*mobile filter button */}
-      <button
-        onClick={toggleSidebar}
-        className="lg:hidden border border-gray-200 p-2 flex justify-center items-center"
-      >
-        <FaFilter className="mr-2" />
-        Filters
-      </button>
+    <main className="container mx-auto px-4 py-8 sm:py-12">
+      <div className="text-center mb-10">
+        <div className="flex items-center justify-center gap-4">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            {searchTerm ? `Results for "${searchTerm}"` : "Our Collections"}
+          </h1>
 
-      {/*filter sidebar */}
-      <div
-        ref={sidebarRef}
-        className={`${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed inset-y-0 z-50 left-0 w-64 bg-white overflow-y-auto transition-transform duration-300 lg:static lg:translate-x-0`}
-      >
-        <FilterSidebar />
+          {searchTerm && (
+            <button
+              onClick={handleClearSearch}
+              className="p-1 rounded-full hover:bg-gray-200"
+              title="Clear search"
+            >
+              <X className="h-6 w-6 text-gray-500" />
+            </button>
+          )}
+        </div>
       </div>
-      <div className="flex-grow p-4">
-        <h2 className="text-2xl uppercase mb-4">All collections</h2>
-        {/*sort options */}
-        <SortOptions />
 
-        {/*product grid */}
-        <ProductGrid products={products} />
+      <div className="flex justify-center flex-wrap gap-2 sm:gap-4 mb-8">
+        {categories.map((category) => (
+          <button
+            key={category}
+            onClick={() => handleCategoryChange(category)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              activeCategory === category
+                ? "bg-gray-900 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            {category}
+          </button>
+        ))}
       </div>
-    </div>
+
+      <div className="flex justify-end mb-6">
+        <SortOptions onSortChange={handleSortChange} />
+      </div>
+
+      <div>
+        <ProductGrid
+          products={products}
+          loading={productsLoading}
+          error={productsError}
+        />
+      </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+    </main>
   );
 };
 
 export default CollectionsPage;
+

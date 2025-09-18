@@ -31,6 +31,7 @@ const ordersSlice = createSlice({
     orders: [],
     ordersLoading: false,
     ordersError: null,
+
     orderDetails: null,
     orderDetailsLoading: false,
     orderDetailsError: null,

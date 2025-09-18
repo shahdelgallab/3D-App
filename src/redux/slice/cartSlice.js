@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { logout } from "./authSlice";
 import api from "../../api/api";
 
-
 export const fetchCartItems = createAsyncThunk(
   "cart/fetchCartItems",
   async (_, { rejectWithValue }) => {
@@ -82,7 +81,7 @@ export const removeItemFromCart = createAsyncThunk(
 
 export const mergeCart = createAsyncThunk(
   "cart/mergeCart",
-  async (cartItems, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const guestId = localStorage.getItem("guest-id");
       const response = await api.put(
@@ -106,8 +105,9 @@ const cartSlice = createSlice({
   initialState: {
     items: [],
     totalPrice: 0,
-    loading: false,
+    loading: true,
     error: null,
+    isInitialized: false,
   },
   reducers: {
     clearCart(state) {
@@ -125,11 +125,13 @@ const cartSlice = createSlice({
 
     const handleRejected = (state, action) => {
       state.loading = false;
+      state.isInitialized = true;
       state.error = action.payload?.message || "An error occurred";
     };
 
     const handleFulfilledWithCart = (state, action) => {
       state.loading = false;
+      state.isInitialized = true;
       state.items = action.payload.items || [];
       state.totalPrice = action.payload.totalPrice || 0;
     };

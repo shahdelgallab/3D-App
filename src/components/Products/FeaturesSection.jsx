@@ -1,44 +1,44 @@
-import React from "react";
-import {
-  HiArrowPathRoundedSquare,
-  HiOutlineCreditCard,
-  HiShoppingBag,
-} from "react-icons/hi2";
+import React from 'react';
+import { Truck, BadgePercent, Wand2 } from 'lucide-react';
+
+const features = [
+  {
+    icon: <Truck size={32} className="text-blue-600" />,
+    title: "Localized Egyptian Service",
+    description: "Understanding local market needs with fast, reliable delivery.",
+  },
+  {
+    icon: <BadgePercent size={32} className="text-green-600" />,
+    title: "Affordable Pricing",
+    description: "Competitive rates compared to expensive import alternatives.",
+  },
+  {
+    icon: <Wand2 size={32} className="text-purple-600" />,
+    title: "Complete Journey",
+    description: "End-to-end service from your idea to the finished product.",
+  },
+];
 
 const FeaturesSection = () => {
   return (
-    <section className="py-16 px-4 bg-white">
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-        <div className="flex flex-col items-center">
-          <div className="p-4 rounded-full mb-4">
-            <HiShoppingBag className="text-xl" />
-          </div>
-          <h4 className="tracking-tighter mb-2 uppercase">
-            Free International Shipping
-          </h4>
-          <p className="text-gray-600 text-sm tracking-tighter">
-            On all orders over $100.00
-          </p>
-        </div>
+    <section className="py-20 sm:py-24 bg-gray-50">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+          
+          {features.map((feature) => (
+            <div key={feature.title} className="flex flex-col items-center p-6">
+              <div className="mb-4">
+                {feature.icon}
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                {feature.title}
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                {feature.description}
+              </p>
+            </div>
+          ))}
 
-        <div className="flex flex-col items-center">
-          <div className="p-4 rounded-full mb-4">
-            <HiArrowPathRoundedSquare className="text-xl" />
-          </div>
-          <h4 className="tracking-tighter mb-2 uppercase">45 days return</h4>
-          <p className="text-gray-600 text-sm tracking-tighter">
-            Money back guarantee
-          </p>
-        </div>
-
-        <div className="flex flex-col items-center">
-          <div className="p-4 rounded-full mb-4">
-            <HiOutlineCreditCard className="text-xl" />
-          </div>
-          <h4 className="tracking-tighter mb-2 uppercase">secure checkout</h4>
-          <p className="text-gray-600 text-sm tracking-tighter">
-            100% secure checkout process
-          </p>
         </div>
       </div>
     </section>

@@ -45,6 +45,7 @@ api.interceptors.response.use(
         console.error("Refresh token is invalid. Logging out.");
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }

@@ -6,9 +6,9 @@ export const fetchUsers = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get("/admin/users");
-      return response.data.data;
+      return response.data.data.users;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
@@ -18,9 +18,9 @@ export const addUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await api.post("/admin/users", userData);
-      return response.data.data;
+      return response.data.data.user;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
@@ -30,9 +30,9 @@ export const updateUserRole = createAsyncThunk(
   async ({ userId, role }, { rejectWithValue }) => {
     try {
       const response = await api.put(`/admin/users/${userId}`, { role });
-      return response.data.data;
+      return response.data.data.user;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
@@ -44,7 +44,7 @@ export const deleteUser = createAsyncThunk(
       await api.delete(`/admin/users/${userId}`);
       return userId;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
@@ -58,63 +58,48 @@ const usersAdminSlice = createSlice({
   },
   reducers: {},
   extraReducers: (builder) => {
+    const handlePending = (state) => {
+      state.loading = true;
+      state.error = null;
+    };
+    const handleRejected = (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    };
+
     builder
-      .addCase(fetchUsers.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(fetchUsers.pending, handlePending)
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload;
+        state.users = action.payload || [];
       })
-      .addCase(fetchUsers.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || "An error occurred";
-      })
+      .addCase(fetchUsers.rejected, handleRejected)
 
-      .addCase(addUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(addUser.pending, handlePending)
       .addCase(addUser.fulfilled, (state, action) => {
         state.loading = false;
         state.users.push(action.payload);
       })
-      .addCase(addUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || "An error occurred";
-      })
+      .addCase(addUser.rejected, handleRejected)
 
-      .addCase(updateUserRole.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(updateUserRole.pending, handlePending)
       .addCase(updateUserRole.fulfilled, (state, action) => {
         state.loading = false;
         const index = state.users.findIndex(
-          (user) => user.id === action.payload.id
+          (user) => user._id === action.payload._id
         );
         if (index !== -1) {
           state.users[index] = action.payload;
         }
       })
-      .addCase(updateUserRole.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || "An error occurred";
-      })
+      .addCase(updateUserRole.rejected, handleRejected)
 
-      .addCase(deleteUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(deleteUser.pending, handlePending)
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = state.users.filter((user) => user.id !== action.payload);
+        state.users = state.users.filter((user) => user._id !== action.payload);
       })
-      .addCase(deleteUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || "An error occurred";
-      });
+      .addCase(deleteUser.rejected, handleRejected);
   },
 });
 
