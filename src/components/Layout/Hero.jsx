@@ -20,7 +20,7 @@ const Hero = () => {
             Explore our print-ready products with fast worldwide shipping.
           </p>
           <Link
-            to="#"
+            to="collections"
             className="bg-white text-gray-950 px-6 py-2 rounded-sm text-lg"
           >
             Shop Now
