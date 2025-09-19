@@ -1,41 +1,98 @@
-import React, { useState } from 'react'
-import { HiMagnifyingGlass, HiMiniXMark } from 'react-icons/hi2'
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, X } from "lucide-react";
 
 const SearchBar = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const inputRef = useRef(null);
+  const containerRef = useRef(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isOpen, setIsOpen] = useState(false)
+  useEffect(() => {
+    if (isOpen) {
+      inputRef.current?.focus();
+    }
+  }, [isOpen]);
 
-  const handleSearchToggle = () => {
-    setIsOpen(!isOpen)
-  }
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+        setSearchTerm("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSearch = (e) => {
-    e.preventDefault()
-    setIsOpen(false)
-  }
+    e.preventDefault();
+    const trimmedSearchTerm = searchTerm.trim();
+
+    if (location.pathname === "/collections") {
+      setSearchParams((prev) => {
+        if (trimmedSearchTerm) {
+          prev.set("search", trimmedSearchTerm);
+        } else {
+          prev.delete("search");
+        }
+        prev.set("page", "1");
+        return prev;
+      });
+    } else {
+      navigate(`/collections?search=${encodeURIComponent(trimmedSearchTerm)}`);
+    }
+  };
 
   return (
-    <div className={`flex items-center justify-center w-full transition-all duration-300 ${isOpen? "absolute top-0 left-0 w-full bg-white h-24 z-50" : "w-auto"}`}>
-      {isOpen? (
-        <form onSubmit={handleSearch} className='relative flex items-center justify-center w-full'>
-          <div className='relative w-1/2'>
-            <input type="text" placeholder='Search' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className='bg-gray-100 px-4 py-2 pl-2 pr-12 rounded-lg focus:outline-none w-full placeholder:text-gray-700'/>
-            <button type='submit' className='absolute right-2 top-1/2 transform -translate-1/2 text-gray-600 hover:text-gray-800'>
-              <HiMagnifyingGlass className='h-6 w-6 '/>
-            </button>
-          </div>
-          <button type='button' onClick={handleSearchToggle} className='absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800'>
-            <HiMiniXMark className='h-6 w-6 '/>
-          </button>
-        </form>
-      ) : (
-        <button onClick={handleSearchToggle}>
-          <HiMagnifyingGlass className='h-6 w-6'/>
-        </button>
-      )}
-    </div>
-  )
-}
+    <div ref={containerRef} className="relative flex items-center">
+      <form onSubmit={handleSearch} className="relative">
+        {/* Search Icon inside the input */}
+        <motion.div
+          layout
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+        >
+          <Search size={20} />
+        </motion.div>
 
-export default SearchBar
+        {/* The Input Field */}
+        <motion.input
+          ref={inputRef}
+          layout
+          initial={{ width: "40px" }}
+          animate={{ width: isOpen ? "250px" : "40px" }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          onFocus={() => setIsOpen(true)}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="h-10 rounded-full bg-gray-100 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+        />
+
+        {/* Clear (X) Button */}
+        <AnimatePresence>
+          {searchTerm && isOpen && (
+            <motion.button
+              type="button"
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              onClick={() => setSearchTerm("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
+              aria-label="Clear search"
+            >
+              <X size={18} />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </form>
+    </div>
+  );
+};
+
+export default SearchBar;

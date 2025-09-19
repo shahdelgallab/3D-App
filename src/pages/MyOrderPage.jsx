@@ -1,138 +1,126 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import { fetchUserOrders } from "../redux/slice/ordersSlice";
+import CheckoutSkeletonCard from "../components/Common/CheckoutSkeletonCard";
+import Error from "../components/Common/Error";
+
+const StatusBadge = ({ status }) => {
+  const statusStyles = {
+    pending: "bg-yellow-100 text-yellow-800",
+    processing: "bg-blue-100 text-blue-800",
+    shipped: "bg-green-100 text-green-800",
+    delivered: "bg-emerald-100 text-emerald-800",
+    canceled: "bg-red-100 text-red-800",
+  };
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${
+        statusStyles[status] || "bg-gray-100 text-gray-800"
+      }`}
+    >
+      {status}
+    </span>
+  );
+};
 
 const MyOrderPage = () => {
-  const [orders, setOrders] = useState([]);
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {
+    orders,
+    ordersLoading: loading,
+    ordersError: error,
+  } = useSelector((state) => state.orders);
 
   useEffect(() => {
-    //simulate fetching orders
-    setTimeout(() => {
-      const mockOrders = [
-        {
-          id: "1",
-          createdAt: new Date(),
-          shippingAddress: { city: "Tokyo", country: "Japan" },
-          orderItems: [
-            {
-              name: "product",
-              image:
-                "	https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-        {
-          id: "2",
-          createdAt: new Date(),
-          shippingAddress: { city: "Tokyo", country: "Japan" },
-          orderItems: [
-            {
-              name: "product",
-              image:
-                "	https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-        {
-          id: "3",
-          createdAt: new Date(),
-          shippingAddress: { city: "Tokyo", country: "Japan" },
-          orderItems: [
-            {
-              name: "product",
-              image:
-                "	https://wallpapers.com/images/high/teal-flower-uyyxk7fcfcqlibja.webp",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-      ];
+    dispatch(fetchUserOrders());
+  }, [dispatch]);
 
-      setOrders(mockOrders);
-    }, 1000);
-  }, []);
+  if (loading) {
+    return <CheckoutSkeletonCard />;
+  }
 
-  const handleRowClick = (orderId) => {
-    navigate(`/order/:${orderId}`);
-  };
+  if (error) {
+    return <Error message={error} />;
+  }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6">
-      <h2 className="text-xl sm:text-2xl font-bold mb-6">My Orders</h2>
-      <div className="relative shadow-md sm:rounded-lg overflow-x-auto">
-        <table className="min-w-full text-left text-gray-500">
-          <thead className="bg-gray-100 text-sm uppercase text-gray-700">
-            <tr>
-              <th className="py-2 px-4 sm:py-3">Image</th>
-              <th className="py-2 px-4 sm:py-3">Order ID</th>
-              <th className="py-2 px-4 sm:py-3">Created</th>
-              <th className="py-2 px-4 sm:py-3">Shipping Adress</th>
-              <th className="py-2 px-4 sm:py-3">Items</th>
-              <th className="py-2 px-4 sm:py-3">Price</th>
-              <th className="py-2 px-4 sm:py-3">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.length > 0 ? (
-              orders.map((order) => (
-                <tr
-                  key={order.id}
-                  onClick={() => handleRowClick(order.id)}
-                  className="border-b border-gray-200 hover:border-gray-50 cursor-pointer"
-                >
-                  <td className="py-2 px-2 sm:py-4 sm:px-4">
+    <div className="container mx-auto max-w-4xl p-4 sm:p-6">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">My Orders</h1>
+
+      {!orders || orders.length === 0 ? (
+        <div className="text-center py-12 border rounded-lg bg-gray-50">
+          <h2 className="text-xl font-semibold text-gray-700">No Orders Yet</h2>
+          <p className="text-gray-500 mt-2">
+            Looks like you haven't placed an order with us.
+          </p>
+          <Link
+            to="/collections"
+            className="mt-4 inline-block px-4 py-2 bg-gray-800 text-white rounded-md text-sm font-semibold hover:bg-gray-900"
+          >
+            Start Shopping
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {orders.map((order) => (
+            <div
+              key={order._id}
+              className="border rounded-lg bg-white shadow-sm overflow-hidden"
+            >
+              {/* Order Header */}
+              <div className="bg-gray-50 p-4 flex flex-col sm:flex-row justify-between sm:items-center border-b">
+                <div>
+                  <p className="text-sm text-gray-500">Order Placed</p>
+                  <p className="font-medium text-gray-700">
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="mt-2 sm:mt-0 sm:text-right">
+                  <p className="text-sm text-gray-500">Order ID</p>
+                  <p className="font-mono text-xs text-gray-600">
+                    #{order._id.toUpperCase()}
+                  </p>
+                </div>
+              </div>
+
+              {/* Order Body */}
+              <div className="p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <StatusBadge status={order.status} />
+                  <p className="text-lg font-bold text-gray-800">
+                    ${order.totalPrice.toFixed(2)}
+                  </p>
+                </div>
+
+                {/* Product Images Preview */}
+                <div className="flex space-x-2">
+                  {order.items.map((item) => (
                     <img
-                      src={order.orderItems[0].image}
-                      alt={order.orderItems[0].name}
-                      className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg"
+                      key={`${item.product._id}-${item.color}-${item.material}`}
+                      src={
+                        item.product?.images?.[0] || "/placeholder-image.jpg"
+                      }
+                      alt={item.product?.name}
+                      className="w-16 h-16 rounded-md object-cover border"
                     />
-                  </td>
-                  <td className="py-2 px-2 sm:py-4 sm:px-4 font-medium text-gray-900 whitespace-nowrap">
-                    #{order.id}
-                  </td>
-                  <td className="py-2 px-2 sm:py-4 sm:px-4">
-                    {new Date(order.createdAt).toLocaleDateString()}{" "}
-                    {new Date(order.createdAt).toLocaleTimeString()}
-                  </td>
-                  <td className="py-2 px-2 sm:py-4 sm:px-4">
-                    {order.shippingAddress
-                      ? `${order.shippingAddress.city}, ${order.shippingAddress.country}`
-                      : "N/A"}
-                  </td>
-                  <td className="py-2 px-2 sm:py-4 sm:px-4">
-                    {order.orderItems.length}
-                  </td>
-                  <td className="py-2 px-2 sm:py-4 sm:px-4">
-                    ${order.totalPrice}
-                  </td>
-                  <td className="py-2 px-2 sm:py-4 sm:px-4">
-                    <span
-                      className={`${
-                        order.isPaid
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      } px-2 py-2 rounded-full text-xs sm:text-sm font-medium`}
-                    >
-                      {order.isPaid ? "Paid" : "Pending"}
-                    </span>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7} className="py-4 px-4 text-center text-gray-500">
-                  You have no orders.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                  ))}
+                </div>
+
+                {/* View Details Button */}
+                <div className="text-right mt-4">
+                  <Link
+                    to={`/order/${order._id}`}
+                    className="text-sm font-semibold text-blue-600 hover:underline"
+                  >
+                    View Details
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
