@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Dialog } from "@headlessui/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, ShoppingBag, Menu, X } from "lucide-react";
+import { User, ShoppingBag, Menu, X, LogIn } from "lucide-react";
 
 import CartDrawer from "../Layout/CartDrawer";
 import SearchBar from "./SearchBar";
@@ -70,12 +70,21 @@ const Navbar = () => {
               </Link>
             )}
             <SearchBar />
-            <Link
-              to="/profile"
-              className="p-2 text-gray-600 hover:text-gray-900"
-            >
-              <User size={22} />
-            </Link>
+            {user ? (
+              <Link
+                to="/profile"
+                className="p-2 text-gray-600 hover:text-gray-900"
+              >
+                <User size={22} />
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="p-2 text-gray-600 hover:text-gray-900"
+              >
+                <LogIn size={22} />
+              </Link>
+            )}
             <button
               onClick={() => setIsCartOpen(true)}
               className="relative p-2 text-gray-600 hover:text-gray-900"
