@@ -25,6 +25,7 @@ import MyCheckoutsPage from "./pages/MyCheckoutPage";
 import CheckoutDetailsPage from "./pages/CheckoutDetailsPage";
 import ProtectedRoutes from "./components/Common/ProtectedRoutes";
 import NotFoundPage from "./pages/NotFoundPage";
+import ComingSoonPage from "./pages/ComingSoonPage";
 
 const AppContent = () => {
   const dispatch = useDispatch();
@@ -44,10 +45,9 @@ const AppContent = () => {
           <Route path="register" element={<Register />} />
           <Route path="profile" element={<Profile />} />
           <Route path="collections" element={<CollectionsPage />} />{" "}
-          {/* Corrected path */}
           <Route path="product/:id" element={<ProductDetails />} />
           <Route path="checkout" element={<Checkout />} />{" "}
-          {/* Corrected spelling */}
+          <Route path="workshop" element={<ComingSoonPage />} />{" "}
           <Route
             path="order-confirmation"
             element={<OrderConfirmationPage />}

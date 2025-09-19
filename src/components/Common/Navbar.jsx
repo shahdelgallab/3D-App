@@ -11,7 +11,7 @@ import SearchBar from "./SearchBar";
 const navLinks = [
   { name: "Gallery", href: "/collections" },
   { name: "Workshop", href: "/workshop" },
-  { name: "About", href: "/about" },
+  { name: "About", href: "https://etb3haly-egypt.vercel.app/" },
 ];
 
 const Navbar = () => {

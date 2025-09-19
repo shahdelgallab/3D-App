@@ -83,7 +83,7 @@ const Footer = () => {
               </Link>
             </li>
             <li>
-              <Link to="#" className="hover:text-gray-900">
+              <Link to="https://etb3haly-egypt.vercel.app/" className="hover:text-gray-900">
                 About Us
               </Link>
             </li>
