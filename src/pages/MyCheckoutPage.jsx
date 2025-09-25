@@ -13,9 +13,9 @@ const StatusBadge = ({ status, paymentStatus }) => {
 
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${styles}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${styles}`}
     >
-      {paymentStatus}
+      {status}
     </span>
   );
 };
@@ -116,9 +116,9 @@ const MyCheckoutsPage = () => {
                 <div className="text-right mt-4">
                   <Link
                     to={`/checkout/${checkout._id}`}
-                    className="text-sm font-semibold text-green-600 hover:underline"
+                    className="text-sm font-semibold text-blue-600 hover:underline"
                   >
-                    Complete Payment
+                    View Details
                   </Link>
                 </div>
               </div>
