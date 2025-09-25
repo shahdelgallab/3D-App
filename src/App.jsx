@@ -26,6 +26,8 @@ import CheckoutDetailsPage from "./pages/CheckoutDetailsPage";
 import ProtectedRoutes from "./components/Common/ProtectedRoutes";
 import NotFoundPage from "./pages/NotFoundPage";
 import ComingSoonPage from "./pages/ComingSoonPage";
+import PaymentFailed from "./pages/PaymentFailed";
+import PaymentPending from "./pages/PaymentPending";
 
 const AppContent = () => {
   const dispatch = useDispatch();
@@ -52,6 +54,8 @@ const AppContent = () => {
             path="order-confirmation"
             element={<OrderConfirmationPage />}
           />
+          <Route path="payment-failed" element={<PaymentFailed />} />
+          <Route path="payment-pending" element={<PaymentPending />} />
           <Route path="order/:id" element={<OrderDetailsPage />} />
           <Route path="my-orders" element={<MyOrderPage />} />
           <Route path="my-checkouts" element={<MyCheckoutsPage />} />
